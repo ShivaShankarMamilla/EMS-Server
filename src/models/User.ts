@@ -2,31 +2,26 @@ import { Schema,model} from "mongoose";
 import { IUser } from "../utils/interfaces.js";
 
 
-const UserSchema = new Schema<IUser>({
-    username:{
-        type:String,
-         required:true,
-         unique:true
-            },
-    password:{
-        type:String,
-        required:true
+const userSchema = new Schema<IUser>({
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true   
+   },
+    joiningDate: { type: Date, default: Date.now },
+    address: { type: String },
+    skills: [{ type: String }],
+    role: { type: String }, 
+    education: {
+      degree: String,
+      fieldOfStudy: String,
+      institution: String,
+      yearOfCompletion: Number,
     },
-    joiningDate:{
-        type:Date,
-        required:true,
-    },
-    address: { 
-        type: String, required: true 
-    },
-  skills: { 
-    type: [String], 
-    required: true 
-    },
-  role: { 
-    type: String, required: true 
-    },
-})
+    bloodGroup: String,
+    dateOfBirth: Date,
+    phoneNumber: {type:String,required:true,unique:true},
+    email: { type: String, required: true, unique: true },
+    gender: { type: String, enum: ['male', 'female', 'others'], required: true },
+  });
 
-const User = model<IUser>('User',UserSchema)
+const User = model<IUser>('User',userSchema)
 export default User
