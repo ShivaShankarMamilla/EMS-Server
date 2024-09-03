@@ -37,3 +37,21 @@ export const educationSchema = z.object({
   export const otpRequestSchema = z.object({
     email: z.string().email(), // Expecting an email for OTP
   });
+
+  export const otpVerifySchema = z.object({
+    _id: z.string().nonempty("User ID is required"),
+    otp: z.number().min(100000, "OTP must be 6 digits").max(999999, "OTP must be 6 digits"),
+  });
+
+  export const passwordResetRequestSchema = z.object({
+    email: z.string().email("Invalid email address"),
+  });
+  
+  export const passwordResetSchema = z.object({
+    // token: z.string().nonempty("Reset token is required"),
+    newPassword: z.string().min(6, "Password must be at least 6 characters long"),
+  });
+
+  export const logoutSchema = z.object({
+    userId: z.string()
+  })

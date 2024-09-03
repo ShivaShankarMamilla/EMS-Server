@@ -1,4 +1,4 @@
-import { userSchema,loginSchema } from "../utils/zodSchemas.js";
+import { userSchema,loginSchema,logoutSchema } from "../utils/zodSchemas.js";
 import User from "../models/User.js";
 import Attendance from "../models/Attendance.js";
 import bcrypt from "bcrypt";
@@ -11,7 +11,7 @@ export const registerController= async(req: Request, res: Response)=> {
       const userData = userSchema.parse(req.body); // Validating user data using zod
   
       // Check for existing user (optional, consider unique username constraint in the model)
-      const existingUser = await User.findOne({ username: userData.username });
+      const existingUser = await User.findOne({ username: userData.username })
       const existingEmail = await User.findOne({email:userData.email})
       const existingPhoneNumber = await User.findOne({phoneNumber:userData.phoneNumber})
       if (existingUser) {
@@ -58,7 +58,7 @@ export const registerController= async(req: Request, res: Response)=> {
   
       // Record login time
       const attendance = new Attendance({
-        user: user._id,
+        userId: user._id,
         date: new Date(),
         loginTime: new Date(),
       });
@@ -75,3 +75,27 @@ export const registerController= async(req: Request, res: Response)=> {
       res.status(500).json({ message: 'Internal server error' });
     }
   };
+
+  export const logoutController = async(req:Request,res:Response) => {
+    const userData = logoutSchema.parse(req.body);
+    const { userId } = userData;
+    try {
+      const attendance = await Attendance.findOne({
+        userId,
+        date: { $gte: new Date().setHours(0, 0, 0, 0) }, // Match records from today
+      });
+  
+      if (!attendance) {
+        return res.status(400).json({ message: 'No login record found for today' });
+      }
+  
+      // Update the logout time
+      attendance.logoutTime = new Date();
+      await attendance.save();
+  
+      res.status(200).json({ message: 'Logout successful, time recorded' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
